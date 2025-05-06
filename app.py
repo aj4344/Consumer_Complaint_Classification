@@ -35,12 +35,13 @@ def predict():
             complaint_text, lr_model, svm_model, tfidf_vect, categories
         )
         
-        # Prepare the results for the template
+        # No need to convert confidence to float - keep it as a string
         return render_template(
-            'results.html',
+            'index.html',  # Use the same template for results
             complaint_text=complaint_text,
+            show_results=True,  # Flag to show the results section
             final_prediction=final_prediction,
-            confidence=confidence,
+            confidence=confidence,  # Keep as string
             rule_based=results['rule_based'],
             rule_confidence=f"{results['rule_confidence']:.2f}",
             logistic_regression=results['logistic_regression'],

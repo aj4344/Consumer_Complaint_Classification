@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Consumer Complaint Classifier</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 10px;
+        }
+        .complaint-example {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .divider {
+            margin: 30px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .analysis-box {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .model-result {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            height: 100%;
+        }
+        .model-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .keyword-badge {
+            display: inline-block;
+            background-color: #e3f2fd;
+            padding: 5px 10px;
+            border-radius: 16px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        h2 {
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+            margin: 30px 0 20px 0;
+        }
+        .final-prediction {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f5f5f5;
+        }
+        #resultsSection {
+            display: {% if show_results %}block{% else %}none{% endif %};
+        }
+    </style>
+</head>
+<body>
+    <h1>Consumer Complaint Classifier</h1>
+    
+    <div>
+        <h4>Enter your complaint text:</h4>
+        <form action="/predict" method="post">
+            <textarea name="complaint_text" placeholder="Type or paste a consumer complaint here...">{{ complaint_text if complaint_text else '' }}</textarea>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Classify Complaint</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="divider"></div>
+
+    <div id="resultsSection">
+        <div class="final-prediction">
+            Final Prediction: <span class="text-primary">{{ final_prediction }}</span>
+            <span class="float-right">
+                Confidence: 
+                <span class="{% if confidence == 'High' %}text-success{% elif confidence == 'Medium' %}text-warning{% else %}text-danger{% endif %}">
+                    {{ confidence }}
+                </span>
+            </span>
+        </div>
+        
+        <h2>Detailed Analysis</h2>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="model-result">
+                    <div class="model-title">Rule-Based Classification</div>
+                    <div>
+                        <strong>Result:</strong> {{ rule_based }}
+                    </div>
+                    <div class="mt-2">
+                        <strong>Confidence:</strong> {{ rule_confidence }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="model-result">
+                    <div class="model-title">Logistic Regression</div>
+                    <div>
+                        <strong>Result:</strong> {{ logistic_regression }}
+                    </div>
+                    <div class="mt-2">
+                        <strong>Confidence:</strong> {{ lr_confidence }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="model-result">
+                    <div class="model-title">SVM</div>
+                    <div>
+                        <strong>Result:</strong> {{ svm }}
+                    </div>
+                    <div class="mt-2">
+                        <strong>Confidence:</strong> {{ svm_confidence }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h2>Weighted Scores by Category</h2>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category, score in weighted_scores %}
+                <tr>
+                    <td>{{ category }}</td>
+                    <td>{{ score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if matched_keywords %}
+        <h2>Matched Keywords</h2>
+        
+        <div>
+            {% for keyword, similarity, score in matched_keywords %}
+            <span class="keyword-badge">{{ keyword }} (similarity: {{ similarity|round(2) }})</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if explanation %}
+        <h2>Explanation</h2>
+        <div class="analysis-box">
+            {{ explanation }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+        <h4>Example Complaints</h4>
+        <p>Click an example to fill the form:</p>
+        
+        <div class="complaint-example" onclick="fillExample(this)">
+            I have been having issues with my credit card account. I was charged an annual fee of $95 that was not disclosed when I signed up for the card.
+        </div>
+        
+        <div class="complaint-example" onclick="fillExample(this)">
+            The mortgage company is threatening foreclosure on my home despite my payments being on time and properly documented.
+        </div>
+
+        <div class="complaint-example" onclick="fillExample(this)">
+            My student loan servicer is not correctly applying my payments to the principal balance as requested. Each month I submit extra payments specifically designated to reduce principal, but they are being applied to future interest instead.
+        </div>
+    </div>
+
+    <script>
+        function fillExample(element) {
+            document.getElementsByName('complaint_text')[0].value = element.innerText.trim();
+        }
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

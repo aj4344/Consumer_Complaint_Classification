@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classification Results</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .analysis-box {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .model-result {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            height: 100%;
+        }
+        .blue-bar {
+            background-color: #3498db;
+            width: 5px;
+            height: 100%;
+            margin-right: 15px;
+            float: left;
+        }
+        .model-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .keyword-badge {
+            display: inline-block;
+            background-color: #e3f2fd;
+            padding: 5px 10px;
+            border-radius: 16px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        h2 {
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+            margin: 30px 0 20px 0;
+        }
+        .final-prediction {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Classification Results</h1>
+    
+    <div class="final-prediction">
+        Final Prediction: <span class="text-primary">{{ final_prediction }}</span>
+        <span class="float-right">
+            Confidence: 
+            <span class="{% if confidence == 'High' %}text-success{% elif confidence == 'Medium' %}text-warning{% else %}text-danger{% endif %}">
+                {{ confidence }}
+            </span>
+        </span>
+    </div>
+    
+    <div class="submitted-complaint mb-4">
+        <h5>Submitted Complaint:</h5>
+        <p>{{ complaint_text }}</p>
+    </div>
+    
+    <h2>Detailed Analysis</h2>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="model-result">
+                <div class="model-title">Rule-Based Classification</div>
+                <div>
+                    <strong>Result:</strong> {{ rule_based }}
+                </div>
+                <div class="mt-2">
+                    <strong>Confidence:</strong> {{ rule_confidence }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="model-result">
+                <div class="model-title">Logistic Regression</div>
+                <div>
+                    <strong>Result:</strong> {{ logistic_regression }}
+                </div>
+                <div class="mt-2">
+                    <strong>Confidence:</strong> {{ lr_confidence }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="model-result">
+                <div class="model-title">SVM</div>
+                <div>
+                    <strong>Result:</strong> {{ svm }}
+                </div>
+                <div class="mt-2">
+                    <strong>Confidence:</strong> {{ svm_confidence }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <h2>Weighted Scores by Category</h2>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category, score in weighted_scores %}
+            <tr>
+                <td>{{ category }}</td>
+                <td>{{ score }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if matched_keywords %}
+    <h2>Matched Keywords</h2>
+    
+    <div>
+        {% for keyword, similarity, score in matched_keywords %}
+        <span class="keyword-badge">{{ keyword }} (similarity: {{ similarity }})</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if explanation %}
+    <h2>Explanation</h2>
+    <div class="analysis-box">
+        {{ explanation }}
+    </div>
+    {% endif %}
+    
+    <div class="text-center mt-4">
+        <a href="/" class="btn btn-primary">Classify Another Complaint</a>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
