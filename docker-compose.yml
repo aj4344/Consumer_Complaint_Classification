@@ -1,0 +1,10 @@
+services:
+  complaint-classifier:
+    build: .
+    image: consumer_complaint_classification:1.0
+    container_name: Consumer_Complaint_Classification1.0
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./templates:/app/templates
+    restart: unless-stopped
