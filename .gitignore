@@ -1,3 +1,34 @@
-"__pycache__/" 
-"*.pyc" 
-"consumer_complaints.csv.zip" 
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Large data files
+consumer_complaints.csv.zip
+
+# Environment
+.env
+venv/
+env/
+.venv/
+
+# Git files that might be unnecessary
+.gitattributes
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
