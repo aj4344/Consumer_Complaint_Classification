@@ -1,5 +1,5 @@
 consumer_complaints.csv 
-consumer_complaints.csv.zip 
-"*.pyc" 
+*.csv.zip 
 "__pycache__/" 
+"*.pyc" 
 "model_dir/*.pt" 
